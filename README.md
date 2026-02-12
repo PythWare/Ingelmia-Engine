@@ -6,6 +6,8 @@ Ingelmia Engine is a modern modding Toolkit for Ascension To The Throne that com
 
 Python 3 installed as well as Pillow. Pillow is an imaging library. To install pillow, open a command prompt and type the command `pip install pillow` , then press enter.
 
+Once you have those installed, place the tools in the game's directory and double click main.pyw or call the script in a command prompt if you prefer. I'd just double click main.pyw, as long as you have python 3 installed then all you have to do is double click main.pyw to run the toolkit. Main.pyw calls the scripts within Ingelmia_Logic as needed, the user (you) only needs to use main.pyw.
+
 # Ingelmia Engine's main GUI
 
 This functions as the main hub you will see before using whatever tool you're needing. As of the current version the tools are Unpacking, Mod Creator, and Mod Manager.
