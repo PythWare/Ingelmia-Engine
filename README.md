@@ -1,6 +1,6 @@
 # Ingelmia Engine Info
 
-Ingelmia Engine is a modern modding Toolkit for Ascension To The Throne that comes with a GUI for each tool. Ingelmia Engine currently supports unpacking the PAK containers for Ascension To The Throne, mod creation with the Mod Creator, and comes with a Mod Manager for applying mods to the containers.disabling mods. Repacking PAK containers to apply mods is no longer needed, Ingelmia Engine will apply mods you make by appending them to the PAK container files. The toolkit also backsup your original PAK containers so that nothing is lost. The toolkit will create the Backups and Mods folder.
+Ingelmia Engine is a modern modding Toolkit for Ascension To The Throne that comes with a GUI for each tool. Ingelmia Engine currently supports unpacking the PAK containers for Ascension To The Throne, mod creation with the Mod Creator, and comes with a Mod Manager for applying mods to the containers/disabling mods. Repacking PAK containers to apply mods is no longer needed, Ingelmia Engine will apply mods you make by appending them to the PAK container files. The toolkit also backsup your original PAK containers so that nothing is lost. The toolkit will create the Backups and Mods folder.
 
 # What is needed to use Ingelmia Engine
 
