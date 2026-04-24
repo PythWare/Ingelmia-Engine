@@ -193,6 +193,12 @@ def game_path(game_folder: Optional[str], *parts: str) -> str:
     base = game_folder or os.getcwd()
     return os.path.join(base, *parts)
 
+def shorten_display_path(path: str, max_len: int = 70) -> str:
+    path = os.path.normpath(path)
+    if len(path) <= max_len:
+        return path
+    return "..." + path[-max_len:]
+
 # Tk style helpers
 
 def setup_lilac_styles(root):
@@ -320,7 +326,11 @@ class BackgroundUnpacker:
                     out.write(taildata)
 
                 if self.progress_callback:
-                    self.progress_callback(i + 1, file_count, f"{pak_path}: {filename}")
+                    self.progress_callback(
+                        i + 1,
+                        file_count,
+                        f"{container.name}: {shorten_display_path(filename)}",
+                    )
 
                 f.seek(return_pos)
 
