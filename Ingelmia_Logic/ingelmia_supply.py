@@ -171,7 +171,6 @@ GAME_PROFILES: Dict[str, GameProfile] = {
         containers=(
             ContainerProfile(0, "Resource0.pak", "Valkyrie_Pak0_Files", 1_289_661_958, 682_188),
             ContainerProfile(1, "Resource1.pak", "Valkyrie_Pak1_Files", 99_703_436, 124_860),
-            ContainerProfile(2, "Resource2.pak", "Valkyrie_Pak2_Files", 344_882_370, 359_596)
         ),
     ),
 }
