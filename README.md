@@ -14,9 +14,9 @@ Once you have those installed, place the tools in the game's directory and doubl
 
 This functions as the main hub you will see before using whatever tool you're needing. As of the current version the tools are Unpacking, Mod Creator, and Mod Manager.
 
-<img width="915" height="647" alt="ing3" src="https://github.com/user-attachments/assets/d151c21c-4072-44de-ad82-5712ae73914c" />
+<img width="917" height="648" alt="new1" src="https://github.com/user-attachments/assets/cfa618f8-6b47-40ab-aa8a-78c857e610a2" />
 
-<img width="920" height="649" alt="ing4" src="https://github.com/user-attachments/assets/4846e499-2c62-4658-a2a4-955b71d4bff7" />
+<img width="920" height="650" alt="new2" src="https://github.com/user-attachments/assets/fbbb8b66-970b-4438-9ade-428e717ed62e" />
 
 # Mod Creator
 
@@ -39,6 +39,10 @@ Mod Manager is a GUI tool that handles mod applying/disabling but has some fancy
 Taildata for Ingelmia Engine is 11 bytes of metadata for Ascension to the throne and 17 bytes for Valkyrie applied to the end of each unpacked file. The reason taildata is created is to ensure mods are safely and properly applied to the PAK containers without ever shifting the original file data (an inefficient method in ascension to the throne's case, it's something that you'd have to do if you wanted to repack containers instead of appending). By appending mods to the end of the container and only updating the metadata sections in PAK containers, original file data is never lost. Ingelmia Engine does not rebuild PAK containers because it's an old and inefficient way to apply mods. Instead it relies on taildata created by the toolkit. It's essential you don't remove/alter the taildata of unpacked files unless you know what you're doing. Files having taildata does not impact modding/viewing of said files.
 
 To explain the purpose of the transfer taildata button, it's meant to transfer taildata for you if your mods are new files. For example, let's say you wanted to mod a texture in gimp or something else if not texture modding. Gimp/said software would create a new file but without the taildata. So to ensure you don't lose taildata and can safely apply/disable mods, you select files lacking taildata and then select the original files that have the taildata that you're modding (i.e., buttonsmainmenu1.tga being the new texture modded file created from exporting with gimp while buttonsmainmenu.tga is the original unmodded texture, you'd use transfer taildata button to ensure the new file has the taildata from the original).
+
+# Batch Update Files
+
+Batch Update Files button is for if you need many files to have taildata. For example, let's say you created 40 new textures and want to replace the game's 40 texture images. Click Batch Update Files button, select the folder that has files that need taildata (what you're using to replace the game's files), select the folder that contains the game's unpacked files you're replacing, and then the tool will tell you if the new files were updated. After that, use Mod Creator to turn your new files into a packaged mod. The transfer taildata button in Mod Creator doesn't need to be used if you used the Batch Update Files button, transfer taildata button is only needed if all you need is 1 file to have taildata.
 
 # Extra Info
 
@@ -93,6 +97,10 @@ Taildata создаётся для того, чтобы моды можно бы
 Кнопка Transfer Taildata нужна для переноса taildata в новые файлы. Например, если вы хотите изменить текстуру в GIMP или другой программе, экспортированный файл будет новым и не будет содержать taildata. Чтобы не потерять taildata и иметь возможность безопасно применять и отключать моды, выберите файл без taildata, а затем выберите оригинальный файл, из которого был сделан мод и в котором taildata уже есть.
 
 Например, `buttonsmainmenu1.tga` может быть новой изменённой текстурой, экспортированной из GIMP, а `buttonsmainmenu.tga` — оригинальной неизменённой текстурой. В таком случае кнопка Transfer Taildata позволит перенести taildata из оригинального файла в новый файл.
+
+# Пакетное обновление файлов
+
+Кнопка «Пакетное обновление файлов» (Batch Update Files) предназначена для случаев, когда вам необходимо добавить «taildata» сразу во множество файлов. Например, предположим, вы создали 40 новых текстур и хотите заменить ими 40 текстурных изображений в игре. Нажмите кнопку «Пакетное обновление файлов», выберите папку с файлами, требующими добавления taildata (теми, которые вы используете для замены игровых файлов), затем выберите папку, содержащую распакованные игровые файлы, которые вы заменяете; после этого инструмент сообщит вам, были ли новые файлы успешно обновлены. Затем используйте Mod Creator, чтобы преобразовать ваши новые файлы в готовый пакет модификации. Кнопку «Перенос taildata» (Transfer taildata) в Mod Creator использовать не нужно, если вы уже воспользовались функцией пакетного обновления; эта кнопка требуется лишь в тех случаях, когда вам необходимо добавить taildata только в один-единственный файл.
 
 # Дополнительная информация
 
