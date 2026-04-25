@@ -306,6 +306,27 @@ class ModCreatorWindow(tk.Toplevel):
         ttk.Button(frame_files, text=tr(self.language, "clear_files"), style="Cyber.TButton", command=self.clear_files).pack(anchor="w")
         ttk.Button(self, text=tr(self.language, "create_package"), style="Cyber.TButton", command=self.create_mod).pack(pady=12)
         ttk.Button(self, text=tr(self.language, "transfer_taildata"), style="Cyber.TButton", command=self.transfer_taildata_gui).pack(pady=5)
+        ttk.Button(self, text=tr(self.language, "batch_update_files"), style="Cyber.TButton", command=self.batch_update_files_gui).pack(pady=5)
+
+    def batch_update_files_gui(self):
+        target_folder = filedialog.askdirectory(title="Step 1: Select the New/Modded folder that needs taildata")
+        if not target_folder:
+            return
+
+        source_folder = filedialog.askdirectory(title="Step 2: Select the Original folder to copy taildata from")
+        if not source_folder:
+            return
+
+        success_count, skipped_count, errors = self.packer.batch_transfer_taildata_by_filename(target_folder, source_folder)
+        result_msg = f"Successfully updated {success_count} files."
+        if skipped_count:
+            result_msg += f"\nSkipped/failed {skipped_count} files."
+        if errors:
+            preview = "\n".join(errors[:40])
+            if len(errors) > 40:
+                preview += f"\n...and {len(errors) - 40} more."
+            result_msg += "\n\nDetails:\n" + preview
+        messagebox.showinfo("Batch Update Result", result_msg)
 
     def transfer_taildata_gui(self):
         targets = filedialog.askopenfilenames(title="Step 1: Select the New/Modded files in order")
@@ -459,6 +480,15 @@ class Core_Tools:
         self.unpack_btn = CyberButton(self.root, tr(self.language, "unpack"), self.start_unpacking, width=250, accent=CYBER_GOOD)
         self.unpack_btn.place(x=595, y=290)
 
+        self.batch_update_btn = CyberButton(
+            self.root,
+            tr(self.language, "batch_update_files"),
+            self.batch_update_files_gui,
+            width=250,
+            accent=CYBER_ACCENT,
+        )
+        self.batch_update_btn.place(x=335, y=355)
+
         self.status_label = ttk.Label(self.root, textvariable=self.status_var, style="Cyber.TLabel", font=("Segoe UI", 10))
         self.status_label.place(x=80, y=448)
         self.progress = ttk.Progressbar(self.root, variable=self.progress_var, maximum=100, length=760, mode="determinate", style="Cyber.Horizontal.TProgressbar")
@@ -512,6 +542,7 @@ class Core_Tools:
         self.creator_btn.configure_text(tr(lang, "open_creator"))
         self.manager_btn.configure_text(tr(lang, "open_manager"))
         self.unpack_btn.configure_text(tr(lang, "unpack"))
+        self.batch_update_btn.configure_text(tr(lang, "batch_update_files"))
 
         self.folder_btn.configure_text(tr(lang, "select_game_folder"))
         self.folder_label.config(text=tr(lang, "game_folder"))
@@ -539,9 +570,31 @@ class Core_Tools:
             self.mod_creator_window.lift()
             self.mod_creator_window.focus_force()
 
+    def batch_update_files_gui(self):
+        target_folder = filedialog.askdirectory(title="Step 1: Select the New/Modded folder that needs taildata")
+        if not target_folder:
+            return
+
+        source_folder = filedialog.askdirectory(title="Step 2: Select the Original folder to copy taildata from")
+        if not source_folder:
+            return
+
+        packer = ModPacker()
+        success_count, skipped_count, errors = packer.batch_transfer_taildata_by_filename(target_folder, source_folder)
+        result_msg = f"Successfully updated {success_count} files."
+        if skipped_count:
+            result_msg += f"\nSkipped/failed {skipped_count} files."
+        if errors:
+            preview = "\n".join(errors[:40])
+            if len(errors) > 40:
+                preview += f"\n...and {len(errors) - 40} more."
+            result_msg += "\n\nDetails:\n" + preview
+        messagebox.showinfo("Batch Update Result", result_msg)
+
     def set_working(self, working: bool):
         self.is_working = working
         self.unpack_btn.set_enabled(not working)
+        self.batch_update_btn.set_enabled(not working)
         self.game_toggle.unbind("<Button-1>") if working else self.game_toggle.bind("<Button-1>", self.game_toggle.click)
 
     def queue_progress(self, done, total, note=None):

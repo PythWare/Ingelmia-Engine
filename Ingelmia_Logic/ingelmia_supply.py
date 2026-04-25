@@ -76,6 +76,7 @@ LANGUAGES = {
         "clear_files": "Clear File List",
         "create_package": "Create Mod Package",
         "transfer_taildata": "Transfer Taildata",
+        "batch_update_files": "Batch Update Files",
         "warning_no_files": "No files added!",
     },
     "ru": {
@@ -121,6 +122,7 @@ LANGUAGES = {
         "clear_files": "Очистить список файлов",
         "create_package": "Создать пакет мода",
         "transfer_taildata": "Перенести Taildata",
+        "batch_update_files": "Пакетно обновить файлы",
         "warning_no_files": "Файлы не добавлены!",
     },
 }
@@ -514,19 +516,98 @@ class ModPacker:
         except Exception:
             return False
 
-    def transfer_taildata(self, target_path: str, source_path: str):
+    def read_taildata_bytes(self, source_path: str) -> bytes:
+        if not os.path.exists(source_path):
+            raise FileNotFoundError(f"Source missing: {os.path.basename(source_path)}")
+        with open(source_path, "rb") as s:
+            data = s.read()
+        _cid, _meta, _off, _size, tail_size = unpack_taildata(data)
+        return data[-tail_size:]
+
+    def strip_existing_taildata(self, target_path: str) -> None:
+        """
+        Removes existing Ingelmia taildata from a target file if it already has it,
+        This makes batch updates safe to run again without stacking taildata twice
+        """
+        with open(target_path, "rb") as f:
+            data = f.read()
+
         try:
-            if not os.path.exists(source_path):
-                return False, f"Source missing: {os.path.basename(source_path)}"
-            with open(source_path, "rb") as s:
-                data = s.read()
-            _cid, _meta, _off, _size, tail_size = unpack_taildata(data)
-            taildata = data[-tail_size:]
+            *_unused, tail_size = unpack_taildata(data)
+        except Exception:
+            return
+
+        with open(target_path, "wb") as f:
+            f.write(data[:-tail_size])
+
+    def transfer_taildata(self, target_path: str, source_path: str, replace_existing: bool = False):
+        try:
+            taildata = self.read_taildata_bytes(source_path)
+            if replace_existing:
+                self.strip_existing_taildata(target_path)
             with open(target_path, "ab") as t:
                 t.write(taildata)
             return True, "OK"
         except Exception as e:
             return False, str(e)
+
+    def collect_files_by_basename(self, folder: str) -> Tuple[Dict[str, str], Dict[str, List[str]]]:
+        matches: Dict[str, str] = {}
+        duplicates: Dict[str, List[str]] = {}
+
+        for root, _dirs, files in os.walk(folder):
+            for filename in files:
+                full_path = os.path.join(root, filename)
+                key = filename.lower()
+                if key in matches:
+                    duplicates.setdefault(key, [matches[key]]).append(full_path)
+                else:
+                    matches[key] = full_path
+
+        for key in duplicates:
+            matches.pop(key, None)
+
+        return matches, duplicates
+
+    def batch_transfer_taildata_by_filename(self, target_folder: str, source_folder: str):
+        """
+        Transfers taildata from source_folder files into target_folder files by matching basename
+        Returns success_count, skipped_count, errors
+        """
+        if not os.path.isdir(target_folder):
+            return 0, 0, [f"Target folder missing: {target_folder}"]
+        if not os.path.isdir(source_folder):
+            return 0, 0, [f"Source folder missing: {source_folder}"]
+
+        source_files, source_duplicates = self.collect_files_by_basename(source_folder)
+        success_count = 0
+        skipped_count = 0
+        errors: List[str] = []
+
+        for root, _dirs, files in os.walk(target_folder):
+            for filename in files:
+                target_path = os.path.join(root, filename)
+                key = filename.lower()
+
+                if key in source_duplicates:
+                    skipped_count += 1
+                    errors.append(f"{filename}: skipped because multiple source files share this name")
+                    continue
+
+                source_path = source_files.get(key)
+                if not source_path:
+                    skipped_count += 1
+                    errors.append(f"{filename}: no matching original file found")
+                    continue
+
+                success, msg = self.transfer_taildata(target_path, source_path)
+                if success:
+                    success_count += 1
+                else:
+                    skipped_count += 1
+                    errors.append(f"{filename}: {msg}")
+
+        return success_count, skipped_count, errors
 
     def create_package(self, meta, files: Iterable[str], output_path: str, image_paths: List[str] = None):
         image_paths = image_paths or []
